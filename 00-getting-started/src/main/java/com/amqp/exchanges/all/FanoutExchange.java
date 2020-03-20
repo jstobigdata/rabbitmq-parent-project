@@ -7,9 +7,16 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Brainless message broadcast.
+ * Unconditional message broadcast.
  */
 public class FanoutExchange {
+
+  public static void declareExchange() throws IOException, TimeoutException {
+    Channel channel = ConnectionManager.getConnection().createChannel();
+    //Declare my-fanout-exchange
+    channel.exchangeDeclare("my-fanout-exchange", BuiltinExchangeType.FANOUT, true);
+    channel.close();
+  }
 
   public static void declareQueues() throws IOException, TimeoutException {
     //Create a channel - do no't share the Channel instance
@@ -20,13 +27,6 @@ public class FanoutExchange {
     channel.queueDeclare("ACQ", true, false, false, null);
     channel.queueDeclare("LightQ", true, false, false, null);
 
-    channel.close();
-  }
-
-  public static void declareExchange() throws IOException, TimeoutException {
-    Channel channel = ConnectionManager.getConnection().createChannel();
-    //Declare my-fanout-exchange
-    channel.exchangeDeclare("my-fanout-exchange", BuiltinExchangeType.FANOUT, true);
     channel.close();
   }
 
@@ -43,21 +43,21 @@ public class FanoutExchange {
     Channel channel = ConnectionManager.getConnection().createChannel();
     channel.basicConsume("LightQ", true, ((consumerTag, message) -> {
       System.out.println(consumerTag);
-      System.out.println(new String(message.getBody()));
+      System.out.println("LightQ: " + new String(message.getBody()));
     }), consumerTag -> {
       System.out.println(consumerTag);
     });
 
     channel.basicConsume("ACQ", true, ((consumerTag, message) -> {
       System.out.println(consumerTag);
-      System.out.println(new String(message.getBody()));
+      System.out.println("ACQ: " + new String(message.getBody()));
     }), consumerTag -> {
       System.out.println(consumerTag);
     });
 
     channel.basicConsume("MobileQ", true, ((consumerTag, message) -> {
       System.out.println(consumerTag);
-      System.out.println(new String(message.getBody()));
+      System.out.println("MobileQ: " + new String(message.getBody()));
     }), consumerTag -> {
       System.out.println(consumerTag);
     });
@@ -65,16 +65,18 @@ public class FanoutExchange {
 
   public static void publishMessage() throws IOException, TimeoutException {
     Channel channel = ConnectionManager.getConnection().createChannel();
-    String message = "Brainless message - to ACQ, LightQ & MobileQ";
+    String message = "Main Power is ON";
     channel.basicPublish("my-fanout-exchange", "", null, message.getBytes());
     channel.close();
   }
 
-  public static void main(String[] args) throws IOException, TimeoutException{
+  public static void main(String[] args) throws IOException, TimeoutException {
     FanoutExchange.declareQueues();
     FanoutExchange.declareExchange();
     FanoutExchange.declareBindings();
-    Thread subscribe = new Thread(){
+
+    //Threads created to publish-subscribe asynchronously
+    Thread subscribe = new Thread() {
       @Override
       public void run() {
         try {
@@ -85,7 +87,7 @@ public class FanoutExchange {
       }
     };
 
-    Thread publish = new Thread(){
+    Thread publish = new Thread() {
       @Override
       public void run() {
         try {

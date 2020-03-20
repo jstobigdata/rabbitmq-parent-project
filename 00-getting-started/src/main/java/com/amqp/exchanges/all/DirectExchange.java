@@ -79,6 +79,7 @@ public class DirectExchange {
     DirectExchange.declareExchange();
     DirectExchange.declareBindings();
 
+    //Threads created to publish-subscribe asynchronously
     Thread subscribe = new Thread(){
       @Override
       public void run() {
