@@ -20,7 +20,7 @@ public class DirectExchange {
 
   //Step-2: Declare the Queues
   public static void declareQueues() throws IOException, TimeoutException {
-    //Create a channel - do no't share the Channel instance
+    //Create a channel - do not share the Channel instance
     Channel channel = ConnectionManager.getConnection().createChannel();
 
     //Create the Queues

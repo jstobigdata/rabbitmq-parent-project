@@ -27,7 +27,7 @@ public class TopicExchange {
    * @throws TimeoutException
    */
   public static void declareQueues() throws IOException, TimeoutException {
-    //Create a channel - do no't share the Channel instance
+    //Create a channel - do not share the Channel instance
     Channel channel = ConnectionManager.getConnection().createChannel();
 
     //Create the Queues
@@ -98,6 +98,7 @@ public class TopicExchange {
   public static void publishMessage() throws IOException, TimeoutException {
     Channel channel = ConnectionManager.getConnection().createChannel();
     String message = "Drink a lot of Water and stay Healthy!";
+    //channel.basicPublish("my-topic-exchange", "sports.sports.sports", null, message.getBytes());
     channel.basicPublish("my-topic-exchange", "health.education", null, message.getBytes());
 
     message = "Learn something new everyday";
@@ -130,7 +131,6 @@ public class TopicExchange {
     });
 
     Thread publish = new Thread(() -> {
-      //Publish
       try {
         TopicExchange.publishMessage();
       } catch (IOException | TimeoutException e) {
