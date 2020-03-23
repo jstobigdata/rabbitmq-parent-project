@@ -7,32 +7,138 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class TopicExchange {
-  public void declareQueues() throws IOException, TimeoutException {
-    Channel channel = ConnectionManager.getConnection().createChannel();
-    //Create Topic Queues
-    channel.queueDeclare("Health-News", true, false, false, null);
-    channel.queueDeclare("Sports-News", true, false, false, null);
-    channel.queueDeclare("Education-News", true, false, false, null);
-    channel.close();
-  }
-
-  public void declareExchange() throws IOException, TimeoutException {
+  /**
+   * Declare a Topic Exchange with the name my-topic-exchange.
+   *
+   * @throws IOException
+   * @throws TimeoutException
+   */
+  public static void declareExchange() throws IOException, TimeoutException {
     Channel channel = ConnectionManager.getConnection().createChannel();
     //Create Topic Exchange
     channel.exchangeDeclare("my-topic-exchange", BuiltinExchangeType.TOPIC, true);
     channel.close();
   }
 
-  public void declareBindings () throws IOException, TimeoutException {
+  /**
+   * Declare Queues to receive respective interested messages.
+   *
+   * @throws IOException
+   * @throws TimeoutException
+   */
+  public static void declareQueues() throws IOException, TimeoutException {
+    //Create a channel - do no't share the Channel instance
     Channel channel = ConnectionManager.getConnection().createChannel();
-    //Create bindings - (queue, exchange, routingKey) - routingKey != null
-    channel.queueBind("Health-News", "my-topic-exchange", "*health*");
-    channel.queueBind("Sports-News", "my-topic-exchange", "sports.*");
-    channel.queueBind("Education-News", "my-topic-exchange", "education*");
+
+    //Create the Queues
+    channel.queueDeclare("HealthQ", true, false, false, null);
+    channel.queueDeclare("SportsQ", true, false, false, null);
+    channel.queueDeclare("EducationQ", true, false, false, null);
+
     channel.close();
   }
 
-  //TODO - subscribe
-  //TODO - publish
-  //TODO - psvm
+  /**
+   * Declare Bindings - register interests using routing key patterns.
+   *
+   * @throws IOException
+   * @throws TimeoutException
+   */
+  public static void declareBindings() throws IOException, TimeoutException {
+    Channel channel = ConnectionManager.getConnection().createChannel();
+    //Create bindings - (queue, exchange, routingKey) - routingKey != null
+    channel.queueBind("HealthQ", "my-topic-exchange", "health.*");
+    channel.queueBind("SportsQ", "my-topic-exchange", "#.sports.*");
+    channel.queueBind("EducationQ", "my-topic-exchange", "#.education");
+    channel.close();
+  }
+
+  /**
+   * Assign Consumers to each of the Queue.
+   *
+   * @throws IOException
+   * @throws TimeoutException
+   */
+  public static void subscribeMessage() throws IOException, TimeoutException {
+    Channel channel = ConnectionManager.getConnection().createChannel();
+    channel.basicConsume("HealthQ", true, ((consumerTag, message) -> {
+      System.out.println("\n\n=========== Health Queue ==========");
+      System.out.println(consumerTag);
+      System.out.println("HealthQ: " + new String(message.getBody()));
+      System.out.println(message.getEnvelope());
+    }), consumerTag -> {
+      System.out.println(consumerTag);
+    });
+
+    channel.basicConsume("SportsQ", true, ((consumerTag, message) -> {
+      System.out.println("\n\n ============ Sports Queue ==========");
+      System.out.println(consumerTag);
+      System.out.println("SportsQ: " + new String(message.getBody()));
+      System.out.println(message.getEnvelope());
+    }), consumerTag -> {
+      System.out.println(consumerTag);
+    });
+
+    channel.basicConsume("EducationQ", true, ((consumerTag, message) -> {
+      System.out.println("\n\n ============ Education Queue ==========");
+      System.out.println(consumerTag);
+      System.out.println("EducationQ: " + new String(message.getBody()));
+      System.out.println(message.getEnvelope());
+    }), consumerTag -> {
+      System.out.println(consumerTag);
+    });
+  }
+
+  /**
+   * Publish Messages with different routing keys.
+   *
+   * @throws IOException
+   * @throws TimeoutException
+   */
+  public static void publishMessage() throws IOException, TimeoutException {
+    Channel channel = ConnectionManager.getConnection().createChannel();
+    String message = "Drink a lot of Water and stay Healthy!";
+    channel.basicPublish("my-topic-exchange", "health.education", null, message.getBytes());
+
+    message = "Learn something new everyday";
+    channel.basicPublish("my-topic-exchange", "education", null, message.getBytes());
+
+    message = "Stay fit in Mind and Body";
+    channel.basicPublish("my-topic-exchange", "education.health", null, message.getBytes());
+
+    channel.close();
+  }
+
+  /**
+   * Execute the methods.
+   *
+   * @param args
+   * @throws IOException
+   * @throws TimeoutException
+   */
+  public static void main(String[] args) throws IOException, TimeoutException {
+    TopicExchange.declareExchange();
+    TopicExchange.declareQueues();
+    TopicExchange.declareBindings();
+
+    Thread subscribe = new Thread(() -> {
+      try {
+        TopicExchange.subscribeMessage();
+      } catch (IOException | TimeoutException e) {
+        e.printStackTrace();
+      }
+    });
+
+    Thread publish = new Thread(() -> {
+      //Publish
+      try {
+        TopicExchange.publishMessage();
+      } catch (IOException | TimeoutException e) {
+        e.printStackTrace();
+      }
+    });
+    subscribe.start();
+    publish.start();
+  }
 }
+
