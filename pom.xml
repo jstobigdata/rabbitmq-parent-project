@@ -15,7 +15,7 @@
   <version>1.0-SNAPSHOT</version>
 
   <modules>
-    <module>getting-started</module>
+    <module>00-getting-started</module>
   </modules>
 
   <properties>
