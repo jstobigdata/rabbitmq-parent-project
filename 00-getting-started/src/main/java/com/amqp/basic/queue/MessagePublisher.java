@@ -11,6 +11,7 @@ public class MessagePublisher {
     Channel channel = connection.createChannel();
     for (int i = 0; i < 4; i++) {
       String message = "Getting started with rabbitMQ - Msg" + i;
+      //publish - (exchange, routingKey, properties, message)
       channel.basicPublish("", CommonConfigs.DEFAULT_QUEUE, null, message.getBytes());
     }
     channel.close();
