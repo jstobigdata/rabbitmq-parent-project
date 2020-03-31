@@ -16,6 +16,7 @@
 
   <modules>
     <module>00-getting-started</module>
+    <module>01-spring-boot-amqp</module>
   </modules>
 
   <properties>
