@@ -1,6 +1,6 @@
 # RabbitMQ tutorial with code examples - Jstobigdata.com
 
-* Navigate inside the rabbitmq-docker and make the docker-compose up.
+* Navigate inside the rabbitmq-docker and run the docker-compose up.
 ```shell script
 cd rabbitmq-docker && docker-compose up
 ```
