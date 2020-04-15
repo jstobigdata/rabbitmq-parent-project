@@ -19,3 +19,10 @@ Tutorial Link - https://jstobigdata.com/rabbitmq/complete-rabbitmq-tutorial-in-j
 10. [Exchange to Exchange binding in RabbitMQ](https://jstobigdata.com/rabbitmq/exchange-to-exchange-binding-in-rabbitmq/)
 11. [Alternate Exchange in RabbitMQ](https://jstobigdata.com/rabbitmq/alternate-exchange-in-rabbitmq/)
 12. [RabbitMQ with Spring AMQP](https://jstobigdata.com/rabbitmq/rabbitmq-with-spring-amqp-and-spring-boot/)
+
+```
+if(you.liked) {
+  GitHub.star();
+  shareWithFriends(this);
+}
+```
