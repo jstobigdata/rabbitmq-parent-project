@@ -20,7 +20,7 @@ public class HeadersExchange {
   public static void declareExchange() throws IOException, TimeoutException {
     Channel channel = ConnectionManager.getConnection().createChannel();
     //Declare my-header-exchange
-    channel.exchangeDeclare("my-headers-exchange", BuiltinExchangeType.HEADERS, true);
+    channel.exchangeDeclare("my-header-exchange", BuiltinExchangeType.HEADERS, true);
     channel.close();
   }
 
@@ -54,19 +54,19 @@ public class HeadersExchange {
     healthArgs.put("x-match", "any"); //Match any of the header
     healthArgs.put("h1", "Header1");
     healthArgs.put("h2", "Header2");
-    channel.queueBind("HealthQ", "my-headers-exchange", "", healthArgs);
+    channel.queueBind("HealthQ", "my-header-exchange", "", healthArgs);
 
     Map<String, Object> sportsArgs = new HashMap<>();
     sportsArgs.put("x-match", "all"); //Match all of the header
     sportsArgs.put("h1", "Header1");
     sportsArgs.put("h2", "Header2");
-    channel.queueBind("SportsQ", "my-headers-exchange", "", sportsArgs);
+    channel.queueBind("SportsQ", "my-header-exchange", "", sportsArgs);
 
     Map<String, Object> educationArgs = new HashMap<>();
     educationArgs.put("x-match", "any"); //Match any of the header
     educationArgs.put("h1", "Header1");
     educationArgs.put("h2", "Header2");
-    channel.queueBind("EducationQ", "my-headers-exchange", "", educationArgs);
+    channel.queueBind("EducationQ", "my-header-exchange", "", educationArgs);
 
     channel.close();
   }
