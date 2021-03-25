@@ -9,6 +9,8 @@ public class MessagePublisher {
     ConnectionFactory factory = new ConnectionFactory();
     Connection connection = factory.newConnection(CommonConfigs.AMQP_URL);
     Channel channel = connection.createChannel();
+
+    channel.queueDeclare(CommonConfigs.DEFAULT_QUEUE, true, false, false, null);
     for (int i = 0; i < 4; i++) {
       String message = "Getting started with rabbitMQ - Msg" + i;
       //publish - (exchange, routingKey, properties, message)
